@@ -1,6 +1,5 @@
-﻿using BookStoreWebApp.Data;
+﻿using BookStore.Model;
 using BookStoreWebApp.IRepositories;
-using BookStoreWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 

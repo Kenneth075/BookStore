@@ -1,5 +1,5 @@
-﻿using BookStoreWebApp.IRepository;
-using BookStoreWebApp.Models;
+﻿using BookStore.Model;
+using BookStoreWebApp.IRepository;
 
 namespace BookStoreWebApp.IRepositories
 {
@@ -7,5 +7,6 @@ namespace BookStoreWebApp.IRepositories
     {
         void Update(Category obj);
         void Save();
+        void Add(Category obj);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace BookStoreWebApp.Models
+namespace BookStore.Model
 {
     public class Category
     {
@@ -13,7 +13,7 @@ namespace BookStoreWebApp.Models
         public string Name { get; set; } = string.Empty;
 
         [DisplayName("Display Order")]
-        [Range(1,100)]
+        [Range(1, 100)]
         public int DisplayOrder { get; set; }
     }
 }

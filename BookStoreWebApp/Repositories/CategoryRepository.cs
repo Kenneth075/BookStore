@@ -1,6 +1,6 @@
-﻿using BookStoreWebApp.Data;
+﻿using BookStore.DataAccess.Data;
+using BookStore.Model;
 using BookStoreWebApp.IRepositories;
-using BookStoreWebApp.Models;
 using BookStoreWebApp.Repository;
 using System.Linq.Expressions;
 
