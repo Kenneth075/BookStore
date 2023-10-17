@@ -3,8 +3,9 @@ using BookStoreWebApp.IRepositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace BookStoreWebApp.Controllers
+namespace BookStoreWebApp.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private readonly ICategoryRepository _categoryRepo;
@@ -28,11 +29,11 @@ namespace BookStoreWebApp.Controllers
         [HttpPost]
         public IActionResult Create(Category obj)
         {
-            if(obj.Name == obj.DisplayOrder.ToString())
+            if (obj.Name == obj.DisplayOrder.ToString())
             {
-                ModelState.AddModelError("name","Display Order cannot exactly match the name");
+                ModelState.AddModelError("name", "Display Order cannot exactly match the name");
             }
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _categoryRepo.Add(obj);
                 _categoryRepo.Save();
@@ -40,18 +41,18 @@ namespace BookStoreWebApp.Controllers
                 return RedirectToAction("Index");
             }
             return View();
-          
+
         }
 
         public IActionResult Edit(int? id)
         {
-            if(id == null || id == 0)
+            if (id == null || id == 0)
             {
                 return NotFound();
             }
-            Category categoryFromDb = _categoryRepo.Get(u=>u.Id == id);
+            Category categoryFromDb = _categoryRepo.Get(u => u.Id == id);
             //Category categoryFromDb = _db.Categories.FirstOrDefault(u=>u.Id==id);
-            if(categoryFromDb == null)
+            if (categoryFromDb == null)
             {
                 return NotFound();
             }
@@ -61,7 +62,7 @@ namespace BookStoreWebApp.Controllers
         [HttpPost]
         public IActionResult Edit(Category obj)
         {
-           
+
             if (ModelState.IsValid)
             {
                 _categoryRepo.Update(obj);
@@ -85,7 +86,7 @@ namespace BookStoreWebApp.Controllers
                 return NotFound();
             }
             return View(category);
-           
+
         }
 
         [HttpPost, ActionName("Delete")]
@@ -104,6 +105,6 @@ namespace BookStoreWebApp.Controllers
         }
 
 
-       
+
     }
 }
