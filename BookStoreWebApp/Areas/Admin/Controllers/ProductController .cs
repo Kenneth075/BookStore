@@ -1,4 +1,5 @@
 ﻿using BookStore.Model;
+using BookStore.Model.ViewModels;
 using BookStoreWebApp.IRepositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -32,22 +33,39 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
                 Text = u.Name,
                 Value = u.Id.ToString(),
             });
-            ViewBag.CategoryList = categorylist;
+
+            ProductViewModel productVM = new ProductViewModel()
+            {
+                CategoryList = categorylist,
+                Product = new Product()
+
+            };
+            //ViewBag.CategoryList = categorylist;
             //ViewData["CategoryList"] = categorylist;
-            return View();
+            return View(productVM);
         }
 
         [HttpPost]
-        public IActionResult Create(Product obj)
+        public IActionResult Create(ProductViewModel productViewModel)
         {
             if (ModelState.IsValid)
             {
-                _productRepo.Add(obj);
+                _productRepo.Add(productViewModel.Product);
                 _productRepo.Save();
                 TempData["success"] = "Category created successfully";
                 return RedirectToAction("Index");
             }
-            return View();
+            else
+            {
+                IEnumerable<SelectListItem> categorylist = _categoryRepo.GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString(),
+                });
+                productViewModel.CategoryList = categorylist;
+                return View(productViewModel);
+            }
+            
 
         }
 
