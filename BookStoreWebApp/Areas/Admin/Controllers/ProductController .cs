@@ -12,11 +12,13 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
     {
         private readonly IProductRepository _productRepo;
         private readonly ICategoryRepository _categoryRepo;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(IProductRepository productRepo, ICategoryRepository categoryRepo)
+        public ProductController(IProductRepository productRepo, ICategoryRepository categoryRepo, IWebHostEnvironment webHostEnvironment)
         {
             _productRepo = productRepo;
             _categoryRepo = categoryRepo;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -26,7 +28,7 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
             return View(objProduct);
         }
 
-        public IActionResult Create()
+        public IActionResult Upsert(int?id)
         {
             IEnumerable<SelectListItem> categorylist = _categoryRepo.GetAll().Select(u => new SelectListItem
             {
@@ -40,17 +42,66 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
                 Product = new Product()
 
             };
+            if(id == null || id == 0)
+            {
+                //Create
+                return View(productVM);
+            }
+            else
+            {
+                //Edit
+                productVM.Product = _productRepo.Get(u => u.Id == id);
+                return View(productVM);
+            }
+
+
             //ViewBag.CategoryList = categorylist;
             //ViewData["CategoryList"] = categorylist;
-            return View(productVM);
+            
         }
 
+
         [HttpPost]
-        public IActionResult Create(ProductViewModel productViewModel)
+        public IActionResult Upsert(ProductViewModel productViewModel, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
-                _productRepo.Add(productViewModel.Product);
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if(file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                    if (!string.IsNullOrEmpty(productViewModel.Product.ImageUrl))
+                    {
+                        //Delete the old image
+                        var oldImagePath = Path.Combine(wwwRootPath, productViewModel.Product.ImageUrl.TrimStart('\\'));
+
+                        if(System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    productViewModel.Product.ImageUrl = @"\images\product\" + fileName;
+                }
+
+
+                if (productViewModel.Product.Id == 0)
+                {
+                    _productRepo.Add(productViewModel.Product);
+                }
+                else
+                {
+                    _productRepo.Update(productViewModel.Product);
+                }
+
+                
                 _productRepo.Save();
                 TempData["success"] = "Category created successfully";
                 return RedirectToAction("Index");
@@ -69,34 +120,55 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
 
         }
 
-        public IActionResult Edit(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            Product productFromDb = _productRepo.Get(u => u.Id == id);
-            //Category categoryFromDb = _db.Categories.FirstOrDefault(u=>u.Id==id);
-            if (productFromDb == null)
-            {
-                return NotFound();
-            }
-            return View(productFromDb);
-        }
 
-        [HttpPost]
-        public IActionResult Edit(Product obj)
-        {
+        //public IActionResult Create()
+        //{
+        //    IEnumerable<SelectListItem> categorylist = _categoryRepo.GetAll().Select(u => new SelectListItem
+        //    {
+        //        Text = u.Name,
+        //        Value = u.Id.ToString(),
+        //    });
 
-            if (ModelState.IsValid)
-            {
-                _productRepo.Update(obj);
-                _productRepo.Save();
-                TempData["success"] = "Category Edited Successfully";
-                return RedirectToAction("Index");
-            }
-            return View("Index");
-        }
+        //    ProductViewModel productVM = new ProductViewModel()
+        //    {
+        //        CategoryList = categorylist,
+        //        Product = new Product()
+
+        //    };
+        //    //ViewBag.CategoryList = categorylist;
+        //    //ViewData["CategoryList"] = categorylist;
+        //    return View(productVM);
+        //}
+
+        //public IActionResult Edit(int? id)
+        //{
+        //    if (id == null || id == 0)
+        //    {
+        //        return NotFound();
+        //    }
+        //    Product productFromDb = _productRepo.Get(u => u.Id == id);
+        //    //Category categoryFromDb = _db.Categories.FirstOrDefault(u=>u.Id==id);
+        //    if (productFromDb == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(productFromDb);
+        //}
+
+
+        //[HttpPost]
+        //public IActionResult Edit(Product obj)
+        //{
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        _productRepo.Update(obj);
+        //        _productRepo.Save();
+        //        TempData["success"] = "Category Edited Successfully";
+        //        return RedirectToAction("Index");
+        //    }
+        //    return View("Index");
+        //}
 
 
         public IActionResult Delete(int? id)

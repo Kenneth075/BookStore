@@ -14,6 +14,7 @@ namespace BookStoreWebApp.Repository
             _db = db;
             this.DbSet = _db.Set<T>();
             //_db.Categories is as Dbset.
+            _db.Products.Include(u => u.Category);
         }
 
         public void Add(T entity)
@@ -21,16 +22,32 @@ namespace BookStoreWebApp.Repository
             DbSet.Add(entity);
         }
 
-        public T Get(Expression<Func<T, bool>> fitter)
+        public T Get(Expression<Func<T, bool>> fitter, string? includeProperties = null)
         {
             IQueryable<T> query = DbSet;
+
             query = query.Where(fitter);
+
+            if (!string.IsNullOrWhiteSpace(includeProperties))
+            {
+                foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(property);
+                }
+            }
             return query.FirstOrDefault();
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(string? includeProperties = null)
         {
             IQueryable<T> query = DbSet;
+            if (!string.IsNullOrWhiteSpace(includeProperties))
+            {
+                foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(property);
+                }
+            }
             return query.ToList();
         }
 
