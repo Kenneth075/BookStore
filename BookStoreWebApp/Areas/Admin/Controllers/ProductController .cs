@@ -1,6 +1,8 @@
 ﻿using BookStore.Model;
 using BookStore.Model.ViewModels;
+using BookStore.Utility;
 using BookStoreWebApp.IRepositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace BookStoreWebApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles =SD.Role_Admin)]
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepo;
