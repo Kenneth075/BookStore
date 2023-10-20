@@ -28,7 +28,7 @@
             </div>
 
         </div>
-        <table class="table table-bordered table-striped">
+        <table @* id="tblData" *@ class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th>Title</th>
@@ -52,7 +52,7 @@
                         </td>
                         <td>@obj.ListPrice</td>
                         <td>@obj.Author</td>
-                        <td></td>
+                        <td>@obj.Category.Name</td>
                         
 
                         <td>
@@ -81,3 +81,6 @@
 
    
 </div>
+@* @section Scripts{
+    <script src="~/js/Product.js"></script>
+} *@

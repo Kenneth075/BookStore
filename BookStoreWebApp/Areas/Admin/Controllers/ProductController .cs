@@ -23,7 +23,7 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            List<Product> objProduct = _productRepo.GetAll().ToList();
+            List<Product> objProduct = _productRepo.GetAll(includeProperties:"Category").ToList();
           
             return View(objProduct);
         }
@@ -201,7 +201,15 @@ namespace BookStoreWebApp.Areas.Admin.Controllers
 
         }
 
+        #region API CALLS
 
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Product> objProduct = _productRepo.GetAll(includeProperties: "Category").ToList();
+            return Json(new { date = objProduct });
+        }
+        #endregion
 
     }
 }
